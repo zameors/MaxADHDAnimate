@@ -92,6 +92,14 @@ CustomAnimTrack[v:FindFirstChildOfClass("Animation").Name] = LoadedTrack
 end
 end
 
+function StopAllCustomTrackExcept(track)
+for i, v in pairs(CustomAnimTrack) do
+if v ~= track then
+v:Stop(0.2)
+end
+end
+end
+
 local function roundV3(v3: Vector3, precision: number?): Vector3
 	local mul = 10^(precision or 0)
 	local function r(x: number): number
@@ -106,20 +114,25 @@ local function onRunning(speed: number)
 	if speed > 0 then
 	if root then
 	local movedir = roundV3(root.CFrame:VectorToObjectSpace(humanoid.MoveDirection),1)
-	if mD[movedir] >= "ForwardRight" then
-		play(CustomAnimTrack.RunRightAnim)
-		CustomAnimTrack.RunRightAnim:AdjustSpeed(speed / 16)
-	elseif mD[movedir] >= "ForwardLeft" then
-	    play(CustomAnimTrack.RunLeftAnim)
+	if mD[movedir] == "ForwardRight" then
+	    StopAllCustomTrackExcept(CustomAnimTrack.RunRightAnim)
+	    play(CustomAnimTrack.RunRightAnim,0.2)
+	    CustomAnimTrack.RunRightAnim:AdjustSpeed(speed / 16)
+	elseif mD[movedir] == "ForwardLeft" then
+	    StopAllCustomTrackExcept(CustomAnimTrack.RunLeftAnim)
+	    play(CustomAnimTrack.RunLeftAnim,0.2)
 	    CustomAnimTrack.RunLeftAnim:AdjustSpeed(speed / 16)
 	elseif mD[movedir] == "BackwardRight" then
-	    play(CustomAnimTrack.RunRight2Anim)
+	    StopAllCustomTrackExcept(CustomAnimTrack.RunRight2Anim)
+	    play(CustomAnimTrack.RunRight2Anim,0.2)
 	    CustomAnimTrack.RunRight2Anim:AdjustSpeed(speed / 16)
 	elseif mD[movedir] == "BackwardLeft" then
-	    play(CustomAnimTrack.RunLeft2Anim)
+	    StopAllCustomTrackExcept(CustomAnimTrack.RunLeft2Anim)
+	    play(CustomAnimTrack.RunLeft2Anim,0.2)
 	    CustomAnimTrack.RunLeft2Anim:AdjustSpeed(speed / 16)
 	elseif mD[movedir] == "Backward" then
-	    play(CustomAnimTrack.RunBackAnim)
+	    StopAllCustomTrackExcept(CustomAnimTrack.RunBackAnim)
+	    play(CustomAnimTrack.RunBackAnim,0.2)
 	    CustomAnimTrack.RunBackAnim:AdjustSpeed(speed / 16)
 	else
 	    play(CustomAnimTrack.RunAnim)
