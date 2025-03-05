@@ -2,7 +2,7 @@
 -- Animate
 -- maximum_adhd
 -- September 21st, 2022
--- Edited By Zameors to support exploits
+-- Edited By Zameors to support exploit executors
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --!strict
 
