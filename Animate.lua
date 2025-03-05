@@ -92,14 +92,6 @@ CustomAnimTrack[v:FindFirstChildOfClass("Animation").Name] = LoadedTrack
 end
 end
 
-function StopAllCustomTrackExcept(track)
-for i, v in pairs(CustomAnimTrack) do
-if v ~= track then
-v:Stop(0.2)
-end
-end
-end
-
 local function roundV3(v3: Vector3, precision: number?): Vector3
 	local mul = 10^(precision or 0)
 	local function r(x: number): number
@@ -108,41 +100,57 @@ local function roundV3(v3: Vector3, precision: number?): Vector3
 	return Vector3.new(r(v3.X), r(v3.Y), r(v3.Z))
 end
 
+local Waist = character:FindFirstChild("Waist",true)
+local Neck = character:FindFirstChild("Neck",true)
+local WaistC0 = Waist.C0
+local NeckC0 = Neck.C0
+
+local function onStrafing(DeltaTime)
+if root and Neck and Waist then
+DeltaTime = math.clamp(DeltaTime * 7.5, 0, 1)
+local HumanoidRootPartCFrame = root.CFrame
+local AssemblyLinearVelocity = root.AssemblyLinearVelocity
+
+local RightVector = AssemblyLinearVelocity * HumanoidRootPartCFrame.RightVector
+local LookVector = AssemblyLinearVelocity * HumanoidRootPartCFrame.LookVector
+        
+local Forward = math.rad(LookVector.X + LookVector.Z)
+local Sideways = math.rad(RightVector.X + RightVector.Z)
+        
+Waist.C0 = Waist.C0:Lerp(CFrame.Angles(- Forward, - Sideways, - Sideways) * WaistC0, DeltaTime)
+Neck.C0 = Neck.C0:Lerp(CFrame.Angles(0, - Sideways, 0) * NeckC0, DeltaTime)
+end
+end
+
 local function onRunning(speed: number)
 	local speed = round(speed)
 
 	if speed > 0 then
 	if root then
-	local movedir = roundV3(root.CFrame:VectorToObjectSpace(humanoid.MoveDirection))
-	if mD[movedir] == "ForwardRight" then
-	    StopAllCustomTrackExcept(CustomAnimTrack.RunRightAnim)
-	    play(CustomAnimTrack.RunRightAnim,0.2)
-	    CustomAnimTrack.RunRightAnim:AdjustSpeed(speed / 16)
-	elseif mD[movedir] == "ForwardLeft" then
-	    StopAllCustomTrackExcept(CustomAnimTrack.RunLeftAnim)
-	    play(CustomAnimTrack.RunLeftAnim,0.2)
+	local movedir = roundV3(root.CFrame:VectorToObjectSpace(humanoid.MoveDirection),1)
+	if mD[movedir] >= "ForwardRight" then
+		play(CustomAnimTrack.RunRightAnim)
+		CustomAnimTrack.RunRightAnim:AdjustSpeed(speed / 16)
+	elseif mD[movedir] >= "ForwardLeft" then
+	    play(CustomAnimTrack.RunLeftAnim)
 	    CustomAnimTrack.RunLeftAnim:AdjustSpeed(speed / 16)
 	elseif mD[movedir] == "BackwardRight" then
-	    StopAllCustomTrackExcept(CustomAnimTrack.RunRight2Anim)
-	    play(CustomAnimTrack.RunRight2Anim,0.2)
+	    play(CustomAnimTrack.RunRight2Anim)
 	    CustomAnimTrack.RunRight2Anim:AdjustSpeed(speed / 16)
 	elseif mD[movedir] == "BackwardLeft" then
-	    StopAllCustomTrackExcept(CustomAnimTrack.RunLeft2Anim)
-	    play(CustomAnimTrack.RunLeft2Anim,0.2)
+	    play(CustomAnimTrack.RunLeft2Anim)
 	    CustomAnimTrack.RunLeft2Anim:AdjustSpeed(speed / 16)
 	elseif mD[movedir] == "Backward" then
-	    StopAllCustomTrackExcept(CustomAnimTrack.RunBackAnim)
-	    play(CustomAnimTrack.RunBackAnim,0.2)
+	    play(CustomAnimTrack.RunBackAnim)
 	    CustomAnimTrack.RunBackAnim:AdjustSpeed(speed / 16)
 	else
-	    StopAllCustomTrackExcept(CustomAnimTrack.RunAnim)
-	    play(CustomAnimTrack.RunAnim,0.2)
+	    play(CustomAnimTrack.RunAnim)
 	    CustomAnimTrack.RunAnim:AdjustSpeed(speed / 16)
 	end
 	end
 	
 	else
-		play(animationTracks.Idle,0.2)
+		play(animationTracks.Idle)
 	end
 end
 
@@ -198,6 +206,7 @@ humanoid.Seated:Connect(onSeated)
 humanoid.Swimming:Connect(onSwimming)
 character.ChildAdded:Connect(onChildAdded)
 character.ChildRemoved:Connect(onChildRemoved)
+game:GetService("RunService").PostSimulation:Connect(onStrafing)
 
 if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService
 and TextChatService.CreateDefaultCommands
