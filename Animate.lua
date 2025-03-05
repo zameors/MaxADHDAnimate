@@ -113,7 +113,7 @@ local function onRunning(speed: number)
 
 	if speed > 0 then
 	if root then
-	local movedir = roundV3(root.CFrame:VectorToObjectSpace(humanoid.MoveDirection),1)
+	local movedir = roundV3(root.CFrame:VectorToObjectSpace(humanoid.MoveDirection))
 	if mD[movedir] == "ForwardRight" then
 	    StopAllCustomTrackExcept(CustomAnimTrack.RunRightAnim)
 	    play(CustomAnimTrack.RunRightAnim,0.2)
@@ -135,13 +135,14 @@ local function onRunning(speed: number)
 	    play(CustomAnimTrack.RunBackAnim,0.2)
 	    CustomAnimTrack.RunBackAnim:AdjustSpeed(speed / 16)
 	else
-	    play(CustomAnimTrack.RunAnim)
+	    StopAllCustomTrackExcept(CustomAnimTrack.RunAnim)
+	    play(CustomAnimTrack.RunAnim,0.2)
 	    CustomAnimTrack.RunAnim:AdjustSpeed(speed / 16)
 	end
 	end
 	
 	else
-		play(animationTracks.Idle)
+		play(animationTracks.Idle,0.2)
 	end
 end
 
