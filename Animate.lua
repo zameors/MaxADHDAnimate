@@ -446,7 +446,8 @@ for id, animDefs in self.Defaults do
 end
 
 -- Register custom animations
-for i, desc: Instance in _G.Folder:GetDescendants() do
+for i, desc: Instance in getgenv().Folder:GetDescendants() do
+	print(desc.Name)
 	checkAnimationAdded(desc)
 end
 
