@@ -10,7 +10,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer -- NOTE: nil if running on the server!
-local character = CharacterAnimated
+local character = _G.CharacterAnimated
 local humanoid = assert(character:FindFirstChildOfClass("Humanoid"), "No Humanoid found for the Animate script to use!")
 local animator = humanoid:FindFirstChildOfClass("Animator")
 
