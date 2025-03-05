@@ -3,14 +3,13 @@ local TextChatService = game:GetService("TextChatService")
 
 local DEFAULT_FADE_TIME: number = 0.1
 
-local character: Model = script.Parent
+local character: Model = _G.CharacterAnimated
 local humanoid = character:WaitForChild("Humanoid"):: Humanoid
+local animator = humanoid
 
 local animationTracks: {[string]: AnimationTrack} = {}
 
 do
-	local animator = humanoid:WaitForChild("Animator"):: Animator
-
 	local animation = Instance.new("Animation")
 
 	local animationData: {[string]: {any}} = {
@@ -32,7 +31,7 @@ do
 		Tool = {"rbxassetid://507768375", Enum.AnimationPriority.Idle},
 		Wave = {"rbxassetid://507770239", Enum.AnimationPriority.Idle}}
 
-	for name, data in animationData do
+	for name, data in pairs(animationData) do
 		animation.AnimationId = data[1]
 
 		local animationTrack = animator:LoadAnimation(animation)
@@ -71,13 +70,63 @@ local function onFreeFalling(active: boolean)
 	if active then play(animationTracks.Fall) end
 end
 
+local root = character:FindFirstChild("HumanoidRootPart")
+
+local mD = {
+ [Vector3.zero] = "Idle",
+ [Vector3.new(0,0,-1)] = "Forward",
+ [Vector3.new(1,0,0)] = "Right",
+ [Vector3.new(0,0,1)] = "Backward",
+ [Vector3.new(-1,0,0)] = "Left",
+ [Vector3.new(1,0,-1)] = "ForwardRight",
+ [Vector3.new(-1,0,-1)] = "ForwardLeft",
+ [Vector3.new(1,0,1)] = "BackwardRight",
+ [Vector3.new(-1,0,1)] = "BackwardLeft"
+}
+
+local CustomAnimTrack = {}
+for i, v in pairs(getgenv().Folder:GetChildren()) do
+if v:FindFirstChildOfClass("Animation") then
+local LoadedTrack = animator:LoadAnimation(v:FindFirstChildOfClass("Animation"))
+CustomAnimTrack[v:FindFirstChildOfClass("Animation").Name] = LoadedTrack
+end
+end
+
+local function roundV3(v3: Vector3, precision: number?): Vector3
+	local mul = 10^(precision or 0)
+	local function r(x: number): number
+		return math.round(x*mul)/mul
+	end
+	return Vector3.new(r(v3.X), r(v3.Y), r(v3.Z))
+end
+
 local function onRunning(speed: number)
 	local speed = round(speed)
 
 	if speed > 0 then
-		play(animationTracks.Run)
-
-		animationTracks.Run:AdjustSpeed(speed / 16)
+	if root then
+	local movedir = roundV3(root.CFrame:VectorToObjectSpace(humanoid.MoveDirection),1)
+	if mD[movedir] >= "ForwardRight" then
+		play(CustomAnimTrack.RunRightAnim)
+		CustomAnimTrack.RunRightAnim:AdjustSpeed(speed / 16)
+	elseif mD[movedir] >= "ForwardLeft" then
+	    play(CustomAnimTrack.RunLeftAnim)
+	    CustomAnimTrack.RunLeftAnim:AdjustSpeed(speed / 16)
+	elseif mD[movedir] == "BackwardRight" then
+	    play(CustomAnimTrack.RunRight2Anim)
+	    CustomAnimTrack.RunRight2Anim:AdjustSpeed(speed / 16)
+	elseif mD[movedir] == "BackwardLeft" then
+	    play(CustomAnimTrack.RunLeft2Anim)
+	    CustomAnimTrack.RunLeft2Anim:AdjustSpeed(speed / 16)
+	elseif mD[movedir] == "Backward" then
+	    play(CustomAnimTrack.RunBackAnim)
+	    CustomAnimTrack.RunBackAnim:AdjustSpeed(speed / 16)
+	else
+	    play(CustomAnimTrack.RunAnim)
+	    CustomAnimTrack.RunAnim:AdjustSpeed(speed / 16)
+	end
+	end
+	
 	else
 		play(animationTracks.Idle)
 	end
