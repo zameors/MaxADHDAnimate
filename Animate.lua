@@ -9,9 +9,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer -- NOTE: nil if running on the server!
-local parent: Instance = assert(script.Parent, "Animate script has no parent!")
-local character = assert(if parent:IsA("Model") then parent else nil, "Parent of Animate must be a Model!")
-
+local character = CharacterAnimated
 local humanoid = assert(character:FindFirstChildOfClass("Humanoid"), "No Humanoid found for the Animate script to use!")
 local animator = humanoid:FindFirstChildOfClass("Animator")
 
