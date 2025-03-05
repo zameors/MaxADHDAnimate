@@ -122,35 +122,50 @@ Neck.C0 = Neck.C0:Lerp(CFrame.Angles(0, - Sideways, 0) * NeckC0, DeltaTime)
 end
 end
 
+function StopAllCustomTrackExcept(track)
+for i, v in pairs(CustomAnimTrack) do
+if v ~= track then
+v:Stop(0.2)
+end
+end
+end
+
 local function onRunning(speed: number)
 	local speed = round(speed)
 
 	if speed > 0 then
 	if root then
-	local movedir = roundV3(root.CFrame:VectorToObjectSpace(humanoid.MoveDirection),1)
-	if mD[movedir] >= "ForwardRight" then
-		play(CustomAnimTrack.RunRightAnim)
-		CustomAnimTrack.RunRightAnim:AdjustSpeed(speed / 16)
-	elseif mD[movedir] >= "ForwardLeft" then
-	    play(CustomAnimTrack.RunLeftAnim)
+	local movedir = roundV3(root.CFrame:VectorToObjectSpace(humanoid.MoveDirection))
+	if mD[movedir] == "ForwardRight" then
+	    StopAllCustomTrackExcept(CustomAnimTrack.RunRightAnim)
+	    play(CustomAnimTrack.RunRightAnim,0.2)
+	    CustomAnimTrack.RunRightAnim:AdjustSpeed(speed / 16)
+	elseif mD[movedir] == "ForwardLeft" then
+	    StopAllCustomTrackExcept(CustomAnimTrack.RunLeftAnim)
+	    play(CustomAnimTrack.RunLeftAnim,0.2)
 	    CustomAnimTrack.RunLeftAnim:AdjustSpeed(speed / 16)
 	elseif mD[movedir] == "BackwardRight" then
-	    play(CustomAnimTrack.RunRight2Anim)
+	    StopAllCustomTrackExcept(CustomAnimTrack.RunRight2Anim)
+	    play(CustomAnimTrack.RunRight2Anim,0.2)
 	    CustomAnimTrack.RunRight2Anim:AdjustSpeed(speed / 16)
 	elseif mD[movedir] == "BackwardLeft" then
-	    play(CustomAnimTrack.RunLeft2Anim)
+	    StopAllCustomTrackExcept(CustomAnimTrack.RunLeft2Anim)
+	    play(CustomAnimTrack.RunLeft2Anim,0.2)
 	    CustomAnimTrack.RunLeft2Anim:AdjustSpeed(speed / 16)
 	elseif mD[movedir] == "Backward" then
-	    play(CustomAnimTrack.RunBackAnim)
+	    StopAllCustomTrackExcept(CustomAnimTrack.RunBackAnim)
+	    play(CustomAnimTrack.RunBackAnim,0.2)
 	    CustomAnimTrack.RunBackAnim:AdjustSpeed(speed / 16)
 	else
 	    play(CustomAnimTrack.RunAnim)
+	    StopAllCustomTrackExcept(CustomAnimTrack.RunAnim)
+	    play(CustomAnimTrack.RunAnim,0.2)
 	    CustomAnimTrack.RunAnim:AdjustSpeed(speed / 16)
 	end
 	end
-	
+
 	else
-		play(animationTracks.Idle)
+		play(animationTracks.Idle,0.2)
 	end
 end
 
