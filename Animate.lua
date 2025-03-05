@@ -1,4 +1,5 @@
 --!strict
+-- yesj
 local TextChatService = game:GetService("TextChatService")
 
 local DEFAULT_FADE_TIME: number = 0.1
