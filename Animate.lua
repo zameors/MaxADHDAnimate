@@ -5,6 +5,7 @@
 -- Edited By Zameors to support exploit executors
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --!strict
+-- this day is a great dayes
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
