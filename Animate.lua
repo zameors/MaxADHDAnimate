@@ -1,11 +1,10 @@
 --!strict
+-- Animate rewritten script for efficient memory usage
 local DEFAULT_FADE_TIME: number = 0.1
 
 local character: Model = _G.CharacterAnimated
 local humanoid = character:WaitForChild("Humanoid"):: Humanoid
 local animator = humanoid:WaitForChild("Animator"):: Animator
-
-local playEmote = script:WaitForChild("PlayEmote")
 
 local animationTracks: {[string]: AnimationTrack} = {}
 
