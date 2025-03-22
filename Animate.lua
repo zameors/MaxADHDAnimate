@@ -1,14 +1,16 @@
 --!strict
--- Animate rewritten script for efficient memory usage
+local TextChatService = game:GetService("TextChatService")
+
 local DEFAULT_FADE_TIME: number = 0.1
 
 local character: Model = _G.CharacterAnimated
 local humanoid = character:WaitForChild("Humanoid"):: Humanoid
-local animator = humanoid:WaitForChild("Animator"):: Animator
 
 local animationTracks: {[string]: AnimationTrack} = {}
 
 do
+	local animator = humanoid:WaitForChild("Animator"):: Animator
+
 	local animationData: {[string]: {any}} = {
 		cheer = {"rbxassetid://507770677", Enum.AnimationPriority.Idle},
 		Climb = {"rbxassetid://507765644", Enum.AnimationPriority.Core},
@@ -17,7 +19,6 @@ do
 		dance3 = {"rbxassetid://507777623", Enum.AnimationPriority.Core},
 		Fall = {"rbxassetid://507767968", Enum.AnimationPriority.Core},
 		Idle = {"rbxassetid://507766388", Enum.AnimationPriority.Core},
-		Landed = {"rbxassetid://507770677", Enum.AnimationPriority.Core}, -- I used the cheer animation ID for testing, replace it with the actual ID of the landing animation
 		laugh = {"rbxassetid://507770818", Enum.AnimationPriority.Idle},
 		Lunge = {"rbxassetid://522638767", Enum.AnimationPriority.Movement},
 		point = {"rbxassetid://507770453", Enum.AnimationPriority.Idle},
@@ -27,7 +28,9 @@ do
 		Swim = {"rbxassetid://913384386", Enum.AnimationPriority.Core},
 		SwimIdle = {"rbxassetid://913389285", Enum.AnimationPriority.Core},
 		Tool = {"rbxassetid://507768375", Enum.AnimationPriority.Idle},
-		wave = {"rbxassetid://507770239", Enum.AnimationPriority.Idle}}
+		wave = {"rbxassetid://507770239", Enum.AnimationPriority.Idle},
+
+		bk = {"rbxassetid://129393686778054", Enum.AnimationPriority.Idle}}
 
 	for name, data in animationData do
 		local animation = Instance.new("Animation")
@@ -37,7 +40,6 @@ do
 		animationTrack.Priority = data[2]
 
 		animationTracks[name] = animationTrack
-
 		animation:Destroy()
 	end
 end
@@ -46,12 +48,11 @@ local animationTrack = animationTracks.Idle
 animationTrack:Play(0)
 
 local childAddedConnection: RBXScriptConnection?
-local landedIsPlaying = false
 
 local round = math.round
 
 local function play(newAnimationTrack: AnimationTrack, fadeTime: number?)
-	if newAnimationTrack.IsPlaying or landedIsPlaying then return end
+	if newAnimationTrack.IsPlaying then return end
 
 	local fadeTime = fadeTime or DEFAULT_FADE_TIME
 
@@ -84,27 +85,6 @@ end
 
 local function onSeated(active: boolean)
 	if active then play(animationTracks.Sit) end
-end
-
-local function onStateChanged(_, humanoidStateType)
-	if humanoidStateType == Enum.HumanoidStateType.Landed and landedIsPlaying == false then
-		landedIsPlaying = true
-
-		local walkSpeed = humanoid.WalkSpeed
-		humanoid.WalkSpeed = 0
-		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
-
-		animationTrack:Stop(DEFAULT_FADE_TIME)
-		animationTracks.Landed:Play(DEFAULT_FADE_TIME)
-		animationTracks.Landed.Stopped:Wait()
-		animationTrack = animationTracks.Idle
-		animationTrack:Play(DEFAULT_FADE_TIME)
-
-		humanoid.WalkSpeed = walkSpeed
-		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
-
-		landedIsPlaying = false
-	end
 end
 
 local function onSwimming(speed: number)
@@ -152,13 +132,9 @@ humanoid.Climbing:Connect(onClimbing)
 humanoid.FreeFalling:Connect(onFreeFalling)
 humanoid.Running:Connect(onRunning)
 humanoid.Seated:Connect(onSeated)
-humanoid.StateChanged:Connect(onStateChanged)
 humanoid.Swimming:Connect(onSwimming)
 character.ChildAdded:Connect(onChildAdded)
 character.ChildRemoved:Connect(onChildRemoved)
-
--- i've replaced this part with another version
--- this is a way so i don't need to create a new bindablefunction
 
 if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService
 	and TextChatService.CreateDefaultCommands
