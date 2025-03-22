@@ -157,6 +157,8 @@ humanoid.Swimming:Connect(onSwimming)
 character.ChildAdded:Connect(onChildAdded)
 character.ChildRemoved:Connect(onChildRemoved)
 
+-- i've replaced this part with another version
+-- this is a way so i don't need to create a new bindablefunction
 
 if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService
 	and TextChatService.CreateDefaultCommands
