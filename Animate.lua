@@ -158,33 +158,35 @@ humanoid.Swimming:Connect(onSwimming)
 character.ChildAdded:Connect(onChildAdded)
 character.ChildRemoved:Connect(onChildRemoved)
 
-playEmote.OnInvoke = function(emote: any): boolean
-	local emoteType = typeof(emote)
 
-	if emoteType == "string" then
+if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService
+	and TextChatService.CreateDefaultCommands
+	and TextChatService.CreateDefaultTextChannels
+then
+	local rbxEmoteCommand = Instance.new("TextChatCommand")
+	rbxEmoteCommand.Name = "RBXEmoteCommand"
+	rbxEmoteCommand.PrimaryAlias = "/emote"
+	rbxEmoteCommand.SecondaryAlias = "/e"
+
+	local textChatCommands = TextChatService:WaitForChild("TextChatCommands")
+	textChatCommands:WaitForChild("RBXEmoteCommand"):Destroy()
+	rbxEmoteCommand.Parent = textChatCommands
+
+	local rbxSystem: TextChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXSystem")
+
+	rbxEmoteCommand.Triggered:Connect(function(_, unfilteredText: string)
+		local emote = string.split(unfilteredText, " ")[2]
 		local animationTrack = animationTracks[emote]
-		if animationTrack == nil then return false end
 
-		if string.find(emote, "dance") then
-			play(animationTrack)
+		if animationTrack then
+			if string.find(emote, "dance") then
+				play(animationTrack)
+			else
+				animationTrack.Looped = false
+				animationTrack:Play(DEFAULT_FADE_TIME)
+			end
 		else
-			animationTrack.Looped = false
-			animationTrack:Play(DEFAULT_FADE_TIME)
+			rbxSystem:DisplaySystemMessage("<font color='#FF4040'>You do not own that emote.</font>")
 		end
-
-		return true
-	elseif emoteType == "Instance" and emote:IsA("Animation") then
-		local animationTrack = animationTracks[emote.Name] -- Buggy type warnings are pretty annoying...
-
-		if animationTrack == nil then
-			animationTrack = animator:LoadAnimation(emote)
-			animationTrack.Priority = Enum.AnimationPriority.Idle
-			animationTracks[emote.Name] = animationTrack
-		end
-
-		play(animationTrack)
-		return true
-	end
-
-	return false
+	end)
 end
